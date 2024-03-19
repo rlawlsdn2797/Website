@@ -1,19 +1,56 @@
+import java.io.*;
+
 public class Server {
+	private static int MaxUserCount = 100, UserCount;
+	private static User[] UserList = new User[MaxUserCount];
+
 	public static void main(String[] args) {
 		startsystem();
 	}
 	
-	private static void startsystem() { //시스템시작
-		int MaxUserCount = 100;
-		User[] u = new User[MaxUserCount];
+	private static void startsystem() {
+		//UserList[0] = new User();
+		//UserList[0].Register(2004, 12, 7, "KIM", "JINWOO", "ADMIN");
+		//FileSave(UserList);
 		
-		int UserCount = 10;
-		
-		u[0].Register(2004, 12, 7, "KIM", "JINWOO", "ADMIN");
+		FileLoad();
+		UserCount = UserList.length;
+		UserList[0].Print();
+	}
+	
+	private static void FileSave(User[] u) {
+		try {
+            FileOutputStream fileOut = new FileOutputStream("UserList.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            
+            out.writeObject(u);
+            out.close();
+            
+            fileOut.close();
+            
+            System.out.println("객체가 직렬화되어 저장되었습니다.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	private static void FileLoad() {
+		try {
+            FileInputStream fileIn = new FileInputStream("UserList.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            UserList = (User[]) in.readObject();
+                        
+            in.close();
+            fileIn.close();
+            
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
 	}
 }
 
-class User {
+class User implements Serializable  {	
 	int BirthY, BirthM, BirthD;
 	String LastName, RealName, NickName;
 		
@@ -25,5 +62,9 @@ class User {
 		LastName = ln;
 		RealName = rn;
 		NickName = nn;
+	}
+	
+	public void Print() {
+		System.out.println(LastName + " " + RealName);
 	}
 }
