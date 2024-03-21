@@ -27,8 +27,9 @@ public class Server {
         JButton btn1 = new JButton("로그인");
         JButton btn2 = new JButton("회원가입");
         JButton btn3 = new JButton("회원가입");
-        JTextField text1 = new JTextField();
-        JPasswordField text2 = new JPasswordField();
+        JButton btn4 = new JButton("뒤로가기");
+        JTextField text1 = new JTextField(); //로그인 아이디
+        JPasswordField text2 = new JPasswordField(); //로그인 비번
         JTextField text3 = new JTextField();
         JTextField text4 = new JTextField();
         JTextField text5 = new JTextField();
@@ -44,7 +45,8 @@ public class Server {
         
         btn1.setBounds(30, 170, 122, 30);
         btn2.setBounds(182, 170, 122, 30);
-        btn3.setBounds(110, 215, 122, 30);
+        btn3.setBounds(30, 215, 122, 30);
+        btn4.setBounds(182, 215, 122, 30);
         text1.setBounds(60, 50, 200, 25);
         text2.setBounds(60, 75, 200, 25);
         text3.setBounds(125, 25, 125, 25);
@@ -73,6 +75,7 @@ public class Server {
         frm2.getContentPane().add(text8);
         
         frm2.getContentPane().add(btn3);
+        frm2.getContentPane().add(btn4);
         
         frm2.getContentPane().add(label3);
         frm2.getContentPane().add(label4);
@@ -84,15 +87,61 @@ public class Server {
         btn1.addActionListener(e -> {
             Login(text1.getText(), text2.getText());
         });
+        
         btn2.addActionListener(e -> {
         	frm.setVisible(false);
             frm2.setVisible(true);
+            
+            text1.setText(null);
+            text2.setText(null);
         });
+        
         btn3.addActionListener(e -> {
             frm.setVisible(true);
             frm2.setVisible(false); //생일 성 이름 닉네임 아이디 비번
+            
+            if(text3.getText().isEmpty()) {
+            	return;
+            }
+            else if(text4.getText().isEmpty()) {
+            	return;
+            }
+            else if(text5.getText().isEmpty()) {
+            	return;
+            }
+            else if(text6.getText().isEmpty()) {
+            	return;
+            }
+            else if(text7.getText().isEmpty()) {
+            	return;
+            }
+            else if(text8.getText().isEmpty()) {
+            	return;
+            }
+
+            System.out.println("회원가입 완료");
+            
             UserList.add(new User(text7.getText(), text5.getText(), text6.getText(), text8.getText(), text3.getText(), text4.getText()));
             FileSave(UserList);
+            
+            text3.setText(null);
+            text4.setText(null);
+            text5.setText(null);
+            text6.setText(null);
+            text7.setText(null);
+            text8.setText(null);
+        });
+        
+        btn4.addActionListener(e -> {
+            frm.setVisible(true);
+            frm2.setVisible(false); //생일 성 이름 닉네임 아이디 비번
+            
+            text3.setText(null);
+            text4.setText(null);
+            text5.setText(null);
+            text6.setText(null);
+            text7.setText(null);
+            text8.setText(null);
         });
         
         frm.setVisible(true);
@@ -118,10 +167,17 @@ public class Server {
 	
 	private static void FileLoad() {
 		try {
+			File file = new File("UserList.ser");
+			
+			if(!file.exists()) {
+				UserList.add(new User("20041207", "KIM", "JINWOO", "ADMIN", "admin", "1234"));
+	            FileSave(UserList);
+			}
+			
             FileInputStream fileIn = new FileInputStream("UserList.ser");
             ObjectInputStream in = new ObjectInputStream(fileIn);
             UserList = (ArrayList<User>) in.readObject();
-                        
+                                    
             in.close();
             fileIn.close();
             
