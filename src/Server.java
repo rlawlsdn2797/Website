@@ -3,10 +3,14 @@ import java.io.*;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.awt.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Server {
-	private static int MaxUserCount = 100;
+	private static int MaxUserCount = 100; //유저 최대 길이
 	private static ArrayList<User> UserList = new ArrayList<User>();
 
 	public static void main(String[] args) {
@@ -54,14 +58,17 @@ public class Server {
 	}
 	
 	public static void Register(String a, String b, String c, String d, String e, String f) {
-		UserList.add(new User(a, b, c, d, e, f));
+		//저장 순서: 생년월일, 성, 이름, 닉네임, 아이디, 비밀번호.
+		String hash = hashPassword(f);
+		UserList.add(new User(a, b, c, d, e, hash));
+				
         FileSave(UserList);
 	}
 	
 	public static boolean Login(String id, String pw) {
 		for(int i = 0; i < UserList.size(); i++) {
-			if(UserList.get(i).idCompare(id)) {
-				if(UserList.get(i).pwCompare(pw)) {
+			if(UserList.get(i).idCompare(id)) { //유저 리스트에 ID가 있는가?
+				if(UserList.get(i).pwCompare(hashPassword(pw))) { //유저 리스트에 그 ID와 PW가 맞는가?
 					System.out.println("로그인 성공 / 닉네임 : " + UserList.get(i).GetName());
 					return true;
 				}
@@ -75,6 +82,28 @@ public class Server {
 		System.out.println("존재하지 않는 아이디입니다.");
 		return false;
 	}
+	
+	public static String hashPassword(String password) { //해시 함수
+        try {
+        	System.out.println(password);
+            MessageDigest digest = MessageDigest.getInstance("SHA-256"); //SHA-256 타입
+            byte[] hash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            
+            System.out.println(hexString.toString());
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("해쉬 에러: ", e);
+        }
+    }
 }
 
 class User implements Serializable  {	
