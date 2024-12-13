@@ -59,7 +59,7 @@ public class Server {
 	
 	public static void Register(String a, String b, String c, String d, String e, String f) {
 		//저장 순서: 생년월일, 성, 이름, 닉네임, 아이디, 비밀번호.
-		String hash = hashPassword(f);
+		String hash = hashPassword(saltPassword(f));
 		UserList.add(new User(a, b, c, d, e, hash));
 				
         FileSave(UserList);
@@ -68,7 +68,7 @@ public class Server {
 	public static boolean Login(String id, String pw) {
 		for(int i = 0; i < UserList.size(); i++) {
 			if(UserList.get(i).idCompare(id)) { //유저 리스트에 ID가 있는가?
-				if(UserList.get(i).pwCompare(hashPassword(pw))) { //유저 리스트에 그 ID와 PW가 맞는가?
+				if(UserList.get(i).pwCompare(hashPassword(saltPassword(pw)))) { //유저 리스트에 그 ID와 PW가 맞는가?
 					System.out.println("로그인 성공 / 닉네임 : " + UserList.get(i).GetName());
 					return true;
 				}
@@ -81,6 +81,11 @@ public class Server {
 		
 		System.out.println("존재하지 않는 아이디입니다.");
 		return false;
+	}
+	
+	public static String saltPassword(String password) { //솔트 함수
+		String result = "SALT" + password + "TLAS";
+		return result; //솔트함수
 	}
 	
 	public static String hashPassword(String password) { //해시 함수
